@@ -12,13 +12,6 @@
 using namespace std;
 using namespace Json;
 
-#include "code.h"
-
-enum Function
-{
-    Login, Register, ChangePrior, AddProject, DelProject
-};
-
 void hanshu(std::string strValue, string& token)
 {
     Client client;
@@ -69,7 +62,7 @@ std::string createString1()
 
     //root.append(userArray);
     person["loginName"] = "T2022";
-    person["password"] = encryptMd5("wqe");
+    person["password"] = ("3979f7f001b2962787ccc75f394b7689");
     //person["sex"] = "male";
     root["userArray"].append(person);
     root["function"] = "login";
@@ -79,6 +72,8 @@ std::string createString1()
     unique_ptr<StreamWriter> jsonWriter(writerBuilder.newStreamWriter());
     jsonWriter->write(root, &os); // json-->stringstream
     string data = os.str(); // 转为string
+
+    //cout << data << endl;
 
     return data;
 }
@@ -196,91 +191,114 @@ std::string createStringTimeTable3(string token)
     return data;
 }
 
-std::string getStringTimeTable(string token, string startDate, string endDate, string range, string total)
-{
-    Json::Value root;
-    Json::Value timeTable;
 
-    StreamWriterBuilder writerBuilder; // 新式API
-    ostringstream os;
-    writerBuilder.settings_["emitUTF8"] = true;
-
-    //root.append(userArray);
-    root["function"] = "getTimeTable";
-    root["token"] = token;
-    timeTable["startDate"] = startDate;
-    timeTable["endDate"] = endDate;
-    timeTable["range"] = range;
-    timeTable["total"] = total;
-    root["timeTable"].append(timeTable);
-
-    // 这里使用智能指针
-    unique_ptr<StreamWriter> jsonWriter(writerBuilder.newStreamWriter());
-    jsonWriter->write(root, &os); // json-->stringstream
-    string data = os.str(); // 转为string
-
-    return data;
-}
 
 
 int main()
 {
-    Json::Value userArray;
-    Json::Value root;
-    Json::Value timeTable;
-
-    StreamWriterBuilder writerBuilder; // 新式API
-    ostringstream os;
-
-    timeTable["projectName"] = "del";
-    timeTable["duration"] = "2";
-    timeTable["time"] = "2020-1-1";
-    root["projects"].append(timeTable);
-    timeTable["projectName"] = "io";
-    timeTable["duration"] = "3";
-    timeTable["time"] = "2020-1-1";
-    root["projects"].append(timeTable);
-    root["userId"] = "1";
-
     std::string token1;
-    std::string token2;
-    std::string token3;
 
     string strValue1 = createString1();
-    //string strValue2 = createString2();
-    //string strValue3 = createString3();
-
-    //std::cout << strValue3 << std::endl;
-
-    //thread thread2(hanshu, strValue2, ref(token2));
     thread thread1(hanshu, strValue1, ref(token1));
-    //thread thread3(hanshu, strValue3, ref(token3));
     thread1.join();
-    //thread2.join();
-    //thread3.join();
 
     std::vector<std::string> vtoken1 = split(token1, ",");
-    //std::vector<std::string> vtoken2 = split(token2, ",");
-    //std::vector<std::string> vtoken3 = split(token3, ",");
-
     token1 = vtoken1[0];
-    //token2 = vtoken2[0];
-    //token3 = vtoken3[0];
 
-    //std::cout << token1 << std::endl;
+    //Group操作函数测试成功
 
-    strValue1 = getStringTimeTable(token1,"2020-1-1","2020-1-2","all","");
-    //strValue2 = createStringTimeTable2(token2);
-    //strValue3 = createStringTimeTable3(token3);//测试再次提交的更改功能
-
-    //std::cout << strValue3 << std::endl;
-
+    /*strValue1 = getGroup(token1);
     thread thread4(myTime, strValue1);
-    //thread thread5(myTime, strValue2);
-    //thread thread6(myTime, strValue3);
-
     thread4.join();
+
+    strValue1 = insertGroup(token1, "testing");
+    thread thread5(myTime, strValue1);
+    thread5.join();
+
+    std::vector<std::string> newGroupName;
+    std::vector<std::string> oldGroupName;
+    newGroupName.emplace_back("test");
+    newGroupName.emplace_back("io");
+    oldGroupName.emplace_back("testing");
+    oldGroupName.emplace_back("1");
+
+    strValue1 = updateGroup(token1, newGroupName, oldGroupName);
+    thread thread6(myTime, strValue1);
+    thread6.join();*/
+
+    //User操作函数测试成功
+
+    /*strValue1 = getUser(token1);
+    thread thread4(myTime, strValue1);
+    thread4.join();
+
+    strValue1 = insertUser(token1, "T2024", "工作", "黄晨", "试试", "0");
+    thread thread5(myTime, strValue1);
+    thread5.join();
+    
+    std::vector<std::string> userName;
+    std::vector<std::string> authority;
+    userName.emplace_back("red");
+    userName.emplace_back("黄晨");
+    authority.emplace_back("1");
+    authority.emplace_back("2");
+
+    strValue1 = updateUserAuthority(token1, userName, authority);
+    thread thread6(myTime, strValue1);
+    thread6.join();*/
+
+    //Project操作函数测试成功
+
+    /*strValue1 = getProject(token1);
+    thread thread4(myTime, strValue1);
+    thread4.join();
+
+    strValue1 = insertProject(token1, "testing", "test", "待完成");
+    thread thread5(myTime, strValue1);
+    thread5.join();
+
+    std::vector<std::string> newProjectName;
+    std::vector<std::string> oldProjectName;
+    std::vector<std::string> manager;
+    std::vector<std::string> state;
+    newProjectName.emplace_back("del");
+    newProjectName.emplace_back("io");
+    oldProjectName.emplace_back("del");
+    oldProjectName.emplace_back("io");
+    manager.emplace_back("炳志");
+    manager.emplace_back("黄晨");
+    state.emplace_back("完成");
+    state.emplace_back("完成");
+
+    strValue1 = updateProject(token1, newProjectName, oldProjectName, manager, state);
+    thread thread6(myTime, strValue1);
+    thread6.join();*/
+
+    //TimeTable操作函数测试成功
+
+    ////测试成功,可以正确获取时间表
+    //strValue1 = getTimeTable(token1,"2020-1-1","2020-1-2","user","not counted");
+    //thread thread4(myTime, strValue1);
+    //thread4.join();
+
+    ////测试成功,已有数据就失败，没有就成功插入
+    //strValue1 = insertTimeTable(token1, "2020-1-2", "del", "5");
+    //thread thread5(myTime, strValue1);
     //thread5.join();
+
+    ////测试成功,成功更新
+    //std::vector<std::string> userName;
+    //std::vector<std::string> projectName;
+    //std::vector<std::string> duration;
+    //userName.emplace_back("yellow");
+    //userName.emplace_back("yellow");
+    //projectName.emplace_back("del");
+    //projectName.emplace_back("io");
+    //duration.emplace_back("3");
+    //duration.emplace_back("3");
+
+    //strValue1 = updateTimeTable(token1, "2020-1-1", userName, projectName, duration);
+    //thread thread6(myTime, strValue1);
     //thread6.join();
 
 	return 0;

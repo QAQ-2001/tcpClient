@@ -7,7 +7,7 @@
 #include <Windows.h>
 
 #define SERV_PORT 9000
-#define IP "127.0.0.1"
+#define IP "192.168.1.168"
 
 void tcpWSA();
 SOCKET tcpInit();
