@@ -20,13 +20,13 @@ Client::~Client()
 
 void Client::sendData(std::string str) 
 {
-	std::cout << str << std::endl;
 	send(clientSocket, str.c_str(), (int)str.size(), 0);
 }
 
 std::string Client::recvData() 
 {
 	recv(clientSocket, recvBuf, BUFSIZE, 0);
+	//std::string recv = GbkToUtf8(recvBuf);
 	std::cout << recvBuf << std::endl;
 	return recvBuf;
 }

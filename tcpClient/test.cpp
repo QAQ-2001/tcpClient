@@ -9,6 +9,8 @@
 #include <thread>
 #include <future>
 
+#pragma warning(disable : 4996) 
+
 using namespace std;
 using namespace Json;
 
@@ -19,11 +21,11 @@ void hanshu(std::string strValue, string& token)
     token = client.recvData();
 }
 
-void myTime(std::string strValue)
+std::string myTime(std::string strValue)
 {
     Client client;
     client.sendData(strValue);
-    client.recvData();
+    return client.recvData();
 }
 
 std::string createString2()
@@ -193,17 +195,34 @@ std::string createStringTimeTable3(string token)
 
 
 
-
 int main()
 {
-    std::string token1;
+    
+    /*std::string token1;
 
     string strValue1 = createString1();
     thread thread1(hanshu, strValue1, ref(token1));
     thread1.join();
 
     std::vector<std::string> vtoken1 = split(token1, ",");
-    token1 = vtoken1[0];
+    token1 = vtoken1[0];*/
+
+    /*strValue1 = getUser(token1);
+    std::string cao;
+    thread thread4(hanshu, strValue1, ref(cao));
+    thread4.join();
+
+    strValue1 = G2U(cao.c_str());
+
+    FILE* fp = fopen("C:\\Users\\yellow_morning\\Desktop\\1.txt", "w");
+    if (fp == NULL)
+    {
+        std::cout << "cao" << std::endl;
+        return 0;
+    }
+    fwrite(strValue1.c_str(), strValue1.size(), 1, fp);*/
+    
+
 
     //Group操作函数测试成功
 

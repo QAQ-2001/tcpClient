@@ -8,6 +8,9 @@
 #include <cryptopp/md5.h>
 #include <cryptopp/files.h>
 #include <cryptopp/hex.h>
+#include <cryptopp/aes.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/modes.h>
 #include <json/json.h>
 
 using namespace CryptoPP;
@@ -349,5 +352,96 @@ std::string encryptMd5(std::string str)
     hashfilter.MessageEnd();
     return digest;
 }
+
+std::string encryptAES(std::string plainText)
+{
+    byte key[CryptoPP::AES::DEFAULT_KEYLENGTH], iv[CryptoPP::AES::BLOCKSIZE];
+    memset(key, 0x00, CryptoPP::AES::DEFAULT_KEYLENGTH);
+    memset(iv, 0x00, CryptoPP::AES::BLOCKSIZE);
+
+    std::string cipherText;
+
+    CryptoPP::AES::Encryption aesEncryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+    CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, iv);
+    CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink(cipherText));
+    stfEncryptor.Put(reinterpret_cast<const unsigned char*>(plainText.c_str()), plainText.length() + 1);
+    stfEncryptor.MessageEnd();
+
+    std::string cipherTextHex;
+    for (int i = 0; i < cipherText.size(); i++)
+    {
+        char ch[3] = { 0 };
+        sprintf_s(ch, "%02x", static_cast<byte>(cipherText[i]));
+        cipherTextHex += ch;
+    }
+
+    return cipherTextHex;
+}
+
+std::string decryptAES(std::string cipherTextHex)
+{
+    byte key[CryptoPP::AES::DEFAULT_KEYLENGTH], iv[CryptoPP::AES::BLOCKSIZE];
+    memset(key, 0x00, CryptoPP::AES::DEFAULT_KEYLENGTH);
+    memset(iv, 0x00, CryptoPP::AES::BLOCKSIZE);
+
+    std::string cipherText;
+    std::string decryptedText;
+
+    int i = 0;
+    while (true)
+    {
+        char c;
+        int x;
+        std::stringstream ss;
+        ss << std::hex << cipherTextHex.substr(i, 2).c_str();
+        ss >> x;
+        c = (char)x;
+        cipherText += c;
+        if (i >= cipherTextHex.length() - 2)
+        {
+            break;
+        }
+        i += 2;
+    }
+
+    CryptoPP::AES::Decryption aesDecryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+    CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, iv);
+    CryptoPP::StreamTransformationFilter stfDecryptor(cbcDecryption, new CryptoPP::StringSink(decryptedText));
+    stfDecryptor.Put(reinterpret_cast<const unsigned char*>(cipherText.c_str()), cipherText.size());
+
+    stfDecryptor.MessageEnd();
+
+    return decryptedText;
+}
+
+char* G2U(const char* gb2312)
+{
+    int len = MultiByteToWideChar(CP_ACP, 0, gb2312, -1, NULL, 0);
+    wchar_t* wstr = new wchar_t[len + 1];
+    memset(wstr, 0, len + 1);
+    MultiByteToWideChar(CP_ACP, 0, gb2312, -1, wstr, len);
+    len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
+    char* str = new char[len + 1];
+    memset(str, 0, len + 1);
+    WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, len, NULL, NULL);
+    if (wstr) delete[] wstr;
+    return str;
+}
+
+char* U2G(const char* utf8)
+{
+    int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+    wchar_t* wstr = new wchar_t[len + 1];
+    memset(wstr, 0, len + 1);
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wstr, len);
+    len = WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
+    char* str = new char[len + 1];
+    memset(str, 0, len + 1);
+    WideCharToMultiByte(CP_ACP, 0, wstr, -1, str, len, NULL, NULL);
+    if (wstr) delete[] wstr;
+    return str;
+}
+
+
 
 #endif

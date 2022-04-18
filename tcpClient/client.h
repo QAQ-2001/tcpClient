@@ -7,6 +7,8 @@
 
 #define BUFSIZE 1024
 
+#include <windows.h>
+
 class Client
 {
 public:
